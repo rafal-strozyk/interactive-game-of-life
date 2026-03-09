@@ -19,7 +19,7 @@ let showGrid = true;
 let animationFrameId = NaN;
 
 const gameSettings = ref({
-  framesPerSecond: 60,
+  framesPerSecond: 30,
   aliveCellChance: 30,
   cellSize: 10,
   gridColor: "#FF00FF",

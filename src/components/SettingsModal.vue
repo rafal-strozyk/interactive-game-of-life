@@ -13,6 +13,7 @@
                   <input-component
                     id="alive-cell-chance"
                     type="number"
+                    inputmode="numeric"
                     :min="1"
                     :max="100"
                     pattern="[0-9]{1,}"
@@ -24,6 +25,7 @@
                   <input-component
                     id="cell-size"
                     type="number"
+                    inputmode="numeric"
                     :min="1"
                     pattern="[0-9]{1,}"
                     label="Cell size (px):"
@@ -62,6 +64,7 @@
                   <input-component
                     id="frame-time"
                     type="number"
+                    inputmode="numeric"
                     :min="1"
                     pattern="[0-9]{1,}"
                     label="How many FPS:"
@@ -187,11 +190,11 @@ watch(
 
 <style scoped lang="scss">
 .modal {
-  @apply fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-4 max-w-full;
+  @apply fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-2 xs:p-4 max-w-full w-dvw h-dvh flex justify-center items-center;
   width: 640px;
 
   &-container {
-    @apply bg-black border-4 border-white outline-4 outline-black outline py-6 px-4 sm:px-6 text-white;
+    @apply bg-black border-4 border-white outline-4 outline-black outline py-6 px-4 sm:px-6 text-white max-h-full overflow-auto;
 
     p {
       @apply text-lg sm:text-xl leading-none my-2;

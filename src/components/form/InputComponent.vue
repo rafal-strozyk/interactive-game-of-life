@@ -2,7 +2,7 @@
   <div class="input">
     <label :for="id">{{ label }}</label>
     <br />
-    <input :id :type :placeholder :min :max :pattern :required v-model="model" />
+    <input :id :type :inputmode :placeholder :min :max :pattern :required v-model="model" />
   </div>
 </template>
 
@@ -10,6 +10,7 @@
 type InputProps = {
   id: string;
   type?: string;
+  inputmode?: "text" | "email" | "search" | "tel" | "url" | "none" | "numeric" | "decimal";
   label: string;
   min?: number;
   max?: number;
@@ -43,7 +44,7 @@ const model = defineModel<string | number>({
     }
 
     &[type="color"] {
-      @apply p-0 min-h-9;
+      @apply rounded-none p-0 min-h-9;
     }
 
     &::-webkit-inner-spin-button {

@@ -6,6 +6,9 @@ module.exports = {
       fontFamily: {
         pixel: ['"Pixelify Sans"', "sans-serif"],
       },
+      screens: {
+        xs: "450px",
+      },
     },
   },
   plugins: [],
