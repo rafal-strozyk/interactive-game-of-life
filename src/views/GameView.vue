@@ -1,15 +1,17 @@
 <template>
   <main>
-    <canvas ref="game-canvas"></canvas>
+    <canvas @click="runGame()" ref="game-canvas"></canvas>
   </main>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref, useTemplateRef, watch } from "vue";
 
+type CellsMatrix = Array<Array<boolean>>;
+
 const gameCanvas = useTemplateRef<HTMLCanvasElement | null>("game-canvas");
-const gameMatrix = ref();
-const nextMatrix = ref();
+const gameMatrix = ref<CellsMatrix>();
+const nextMatrix = ref<CellsMatrix>();
 
 const aliveCellChance = ref(0.3);
 const cellSize = ref(10);
@@ -40,31 +42,69 @@ function setupGame(): void {
     return;
   }
 
-  const rows = Math.ceil(gameCanvas.value.height / cellSize.value);
-  const cols = Math.ceil(gameCanvas.value.width / cellSize.value);
+  const rows = Math.floor(gameCanvas.value.height / cellSize.value);
+  const cols = Math.floor(gameCanvas.value.width / cellSize.value);
 
   gameMatrix.value = Array.from({ length: rows }, () =>
     Array.from({ length: cols }, () => Math.random() < aliveCellChance.value),
   );
 
-  console.log(gameMatrix.value);
-  nextMatrix.value = new Array(rows).fill(new Array(cols));
+  nextMatrix.value = Array.from({ length: rows }, () => new Array(cols).fill(false));
 }
 
-function deepCopyArray<T = unknown>(array: Array<T>): Array<T> | T {
-  const copy = [] as Array<T>;
-  array.forEach((item: T) => {
-    if (Array.isArray(item)) {
-      copy.push(deepCopyArray(item));
-    } else {
-      copy.push(item);
+function getNeighborsSum(grid: Array<Array<boolean>>, rowIndex: number, colIndex: number) {
+  let sum = 0;
+
+  for (let i = -1; i <= 1; i++) {
+    for (let j = -1; j <= 1; j++) {
+      if (i === 0 && j === 0) {
+        continue;
+      }
+
+      sum += grid[rowIndex + i]?.[colIndex + j] ? 1 : 0;
     }
-  });
-  return copy;
+  }
+
+  return sum;
 }
 
-function drawCells(cells: Array<Array<number>>): void {
-  if (gameCanvas.value === null) {
+function runGame() {
+  // let gameLoop = setInterval(() => {
+  const game = gameMatrix.value;
+  const next = nextMatrix.value;
+
+  if (game === undefined || next === undefined) {
+    //handle errors
+    // clearTimeout(gameLoop);
+    return;
+  }
+
+  for (const [rowIndex, row] of game.entries()) {
+    for (const [colIndex, cell] of row.entries()) {
+      if (next[rowIndex]?.[colIndex] === undefined) {
+        //handle errors
+        console.log("błąd");
+        return;
+      }
+
+      const livingNeighbors = getNeighborsSum(game, rowIndex, colIndex);
+
+      if (!cell) {
+        next[rowIndex][colIndex] = livingNeighbors === 3;
+        continue;
+      }
+
+      next[rowIndex][colIndex] = livingNeighbors === 2 || livingNeighbors === 3;
+    }
+  }
+
+  console.log("swap");
+  [gameMatrix.value, nextMatrix.value] = [nextMatrix.value, gameMatrix.value];
+  // }, 1000);
+}
+
+function drawCells(cells: CellsMatrix | undefined): void {
+  if (gameCanvas.value === null || cells === undefined) {
     //handle errors
     return;
   }
