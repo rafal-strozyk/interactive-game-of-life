@@ -1,11 +1,13 @@
 <template>
   <main>
-    <canvas @click="runGame()" ref="game-canvas"></canvas>
+    <canvas ref="game-canvas"></canvas>
+    <settings-modal v-model="gameSettings" @confirm="console.log('confirmed')" />
   </main>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, useTemplateRef, watch } from "vue";
+import { onMounted, reactive, ref, useTemplateRef, watch } from "vue";
+import SettingsModal from "@/components/SettingsModal.vue";
 
 type CellsMatrix = Array<Array<boolean>>;
 
@@ -13,12 +15,15 @@ const gameCanvas = useTemplateRef<HTMLCanvasElement | null>("game-canvas");
 const gameMatrix = ref<CellsMatrix>();
 const nextMatrix = ref<CellsMatrix>();
 
-const aliveCellChance = ref(0.3);
-const cellSize = ref(10);
-const cellColors = {
-  dead: "#000",
-  alive: "#fff",
-};
+const gameSettings = reactive({
+  frameTime: 1000,
+  aliveCellChance: 0.3,
+  cellSize: 10,
+  cellColors: {
+    dead: "#000",
+    alive: "#fff",
+  },
+});
 
 function setupCanvas(): void {
   if (gameCanvas.value === null) {
@@ -37,16 +42,16 @@ function setupCanvas(): void {
 }
 
 function setupGame(): void {
-  if (cellSize.value <= 0 || gameCanvas.value === null) {
+  if (gameSettings.cellSize <= 0 || gameCanvas.value === null) {
     //handle errors
     return;
   }
 
-  const rows = Math.floor(gameCanvas.value.height / cellSize.value);
-  const cols = Math.floor(gameCanvas.value.width / cellSize.value);
+  const rows = Math.floor(gameCanvas.value.height / gameSettings.cellSize);
+  const cols = Math.floor(gameCanvas.value.width / gameSettings.cellSize);
 
   gameMatrix.value = Array.from({ length: rows }, () =>
-    Array.from({ length: cols }, () => Math.random() < aliveCellChance.value),
+    Array.from({ length: cols }, () => Math.random() < gameSettings.aliveCellChance),
   );
 
   nextMatrix.value = Array.from({ length: rows }, () => new Array(cols).fill(false));
@@ -100,7 +105,7 @@ function runGame() {
 
   console.log("swap");
   [gameMatrix.value, nextMatrix.value] = [nextMatrix.value, gameMatrix.value];
-  // }, 1000);
+  // }, frameTime.value);
 }
 
 function drawCells(cells: CellsMatrix | undefined): void {
@@ -116,17 +121,17 @@ function drawCells(cells: CellsMatrix | undefined): void {
     return;
   }
 
-  context.fillStyle = cellColors.dead;
-  context.fillRect(0, 0, cellSize.value, cellSize.value);
+  context.fillStyle = gameSettings.cellColors.dead;
+  context.fillRect(0, 0, gameCanvas.value.width, gameCanvas.value.height);
 
   cells.forEach((row, rowIndex) => {
     row.forEach((value, columnIndex) => {
-      context.fillStyle = value ? cellColors.alive : cellColors.dead;
+      context.fillStyle = value ? gameSettings.cellColors.alive : gameSettings.cellColors.dead;
       context.fillRect(
-        columnIndex * cellSize.value,
-        rowIndex * cellSize.value,
-        cellSize.value,
-        cellSize.value,
+        columnIndex * gameSettings.cellSize,
+        rowIndex * gameSettings.cellSize,
+        gameSettings.cellSize,
+        gameSettings.cellSize,
       );
     });
   });
@@ -144,18 +149,10 @@ watch(gameMatrix, () => {
 
 <style lang="scss" scoped>
 main {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100%;
+  @apply flex justify-center items-center size-full;
 
   canvas {
-    width: 100%;
-    height: 100%;
-    flex-grow: 1;
-    display: block;
-    object-fit: cover;
+    @apply size-full flex-grow block object-cover;
   }
 }
 </style>
