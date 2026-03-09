@@ -1,12 +1,12 @@
 <template>
   <main>
     <canvas ref="game-canvas"></canvas>
-    <settings-modal v-model="gameSettings" @redraw="drawCells()" />
+    <settings-modal v-model="gameSettings" @redraw="drawCells()" @start="startGame()" />
   </main>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, useTemplateRef } from "vue";
+import { onMounted, onUnmounted, ref, useTemplateRef } from "vue";
 import SettingsModal from "@/components/SettingsModal.vue";
 
 type CellsMatrix = Array<Array<boolean>>;
@@ -15,8 +15,10 @@ const gameCanvas = useTemplateRef<HTMLCanvasElement | null>("game-canvas");
 const gameMatrix = ref<CellsMatrix>();
 const nextMatrix = ref<CellsMatrix>();
 
+let showGrid = true;
+let animationFrameId = NaN;
+
 const gameSettings = ref({
-  showGrid: true,
   framesPerSecond: 60,
   aliveCellChance: 30,
   cellSize: 10,
@@ -26,6 +28,67 @@ const gameSettings = ref({
     alive: "#ffffff",
   },
 });
+
+function stopAnimation() {
+  cancelAnimationFrame(animationFrameId);
+  animationFrameId = NaN;
+}
+
+function newGame() {
+  stopAnimation();
+  setupGame();
+}
+
+function togglePause() {
+  if (Number.isNaN(animationFrameId)) {
+    startGame();
+    return;
+  }
+  stopAnimation();
+}
+
+function keyboardListeners(event: KeyboardEvent) {
+  switch (event.key) {
+    case "g": {
+      showGrid = !showGrid;
+      drawCells();
+      return;
+    }
+
+    case "r": {
+      newGame();
+      return;
+    }
+
+    case "n": {
+      if (Number.isNaN(animationFrameId)) {
+        calculateNextFrame();
+        drawCells();
+      }
+      return;
+    }
+
+    case " ": {
+      togglePause();
+      return;
+    }
+  }
+}
+
+function pointerListeners(event: TouchEvent) {
+  event.preventDefault();
+  togglePause();
+}
+
+function setupControls(): void {
+  document.addEventListener("keydown", keyboardListeners);
+  gameCanvas.value?.addEventListener("touchstart", pointerListeners, { passive: false });
+}
+
+function removeControls(): void {
+  document.addEventListener("keydown", keyboardListeners);
+  gameCanvas.value?.removeEventListener("touchstart", pointerListeners);
+}
 
 function setupCanvas(): void {
   if (gameCanvas.value === null) {
@@ -130,7 +193,7 @@ function drawCells(): void {
   context.fillRect(0, 0, gameCanvas.value.width, gameCanvas.value.height);
 
   // grid
-  if (gameSettings.value.showGrid) {
+  if (showGrid) {
     const canvasWidth = gameCanvas.value.width;
     const canvasHeight = gameCanvas.value.height;
 
@@ -179,13 +242,21 @@ function gameLoop(timestamp: number) {
     lastFrameTimestamp = timestamp - (delta % frameInterval);
   }
 
+  animationFrameId = requestAnimationFrame(gameLoop);
+}
+
+function startGame() {
   requestAnimationFrame(gameLoop);
 }
 
 onMounted(() => {
+  setupControls();
   setupCanvas();
   setupGame();
-  requestAnimationFrame(gameLoop);
+});
+
+onUnmounted(() => {
+  removeControls();
 });
 </script>
 

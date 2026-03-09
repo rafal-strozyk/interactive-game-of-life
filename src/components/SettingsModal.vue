@@ -75,28 +75,34 @@
             <div v-else-if="STEPS[step] === 'controls'">
               <p>Below is a list of all the controls available to you:</p>
               <ul>
-                <li>
+                <li class="hide-on-mobile">
                   "Space"
                   <ul>
-                    <li>Pauses the simulation</li>
+                    <li>Pause/Resume the simulation</li>
                   </ul>
                 </li>
-                <li>
+                <li class="hide-on-desktop">
+                  Touch:
+                  <ul>
+                    <li>Pause/Resume the simulation</li>
+                  </ul>
+                </li>
+                <li class="hide-on-mobile">
                   "G"
                   <ul>
                     <li>Toggle grid view</li>
                   </ul>
                 </li>
-                <li>
+                <li class="hide-on-mobile">
                   "R"
                   <ul>
                     <li>Reset the simulation</li>
                   </ul>
                 </li>
-                <li>
+                <li class="hide-on-mobile">
                   "N"
                   <ul>
-                    <li>Next step (work only when the simulation is paused)</li>
+                    <li>Next step (works only when the simulation is paused)</li>
                   </ul>
                 </li>
               </ul>
@@ -111,7 +117,15 @@
             >
               Next
             </generic-button>
-            <generic-button v-else @click="step++"> Start game </generic-button>
+            <generic-button
+              v-else
+              @click="
+                open = false;
+                emits('start');
+              "
+            >
+              Start game
+            </generic-button>
           </div>
         </div>
       </div>
@@ -148,7 +162,7 @@ const model = defineModel<ModalModel>({
   required: true,
 });
 
-const emits = defineEmits(["redraw"]);
+const emits = defineEmits(["redraw", "start"]);
 
 let redrawTimeout = NaN;
 
@@ -181,6 +195,30 @@ watch(
 
     p {
       @apply text-lg sm:text-xl leading-none my-2;
+    }
+
+    ul {
+      li {
+        @apply text-base pb-1;
+        ul {
+          @apply pl-2;
+          li {
+            @apply pl-2;
+          }
+        }
+      }
+    }
+
+    .hide-on-mobile {
+      @media (pointer: coarse) {
+        @apply hidden;
+      }
+    }
+
+    .hide-on-desktop {
+      @media (pointer: fine) {
+        @apply hidden;
+      }
     }
   }
 }
