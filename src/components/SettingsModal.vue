@@ -52,6 +52,14 @@
                 </div>
                 <div class="grid sm:grid-cols-2 gap-4">
                   <input-component
+                    id="grid-color"
+                    type="color"
+                    label="Grid color:"
+                    required
+                    placeholder=""
+                    v-model="model.gridColor"
+                  />
+                  <input-component
                     id="frame-time"
                     type="number"
                     :min="1"
@@ -114,6 +122,7 @@ type ModalModel = {
   framesPerSecond: number;
   aliveCellChance: number;
   cellSize: number;
+  gridColor: string;
   cellColors: {
     dead: string;
     alive: string;

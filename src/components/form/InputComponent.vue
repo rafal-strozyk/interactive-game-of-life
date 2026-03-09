@@ -43,7 +43,7 @@ const model = defineModel<string | number>({
     }
 
     &[type="color"] {
-      @apply p-0 min-h-8;
+      @apply p-0 min-h-9;
     }
 
     &::-webkit-inner-spin-button {

@@ -16,10 +16,11 @@ const gameMatrix = ref<CellsMatrix>();
 const nextMatrix = ref<CellsMatrix>();
 
 const gameSettings = ref({
-  showGrid: false,
+  showGrid: true,
   framesPerSecond: 60,
   aliveCellChance: 30,
   cellSize: 10,
+  gridColor: "#FF00FF",
   cellColors: {
     dead: "#000000",
     alive: "#ffffff",
@@ -93,7 +94,6 @@ function runGame() {
     for (const [colIndex, cell] of row.entries()) {
       if (next[rowIndex]?.[colIndex] === undefined) {
         //handle errors
-        console.log("błąd");
         return;
       }
 
@@ -108,9 +108,8 @@ function runGame() {
     }
   }
 
-  console.log("swap");
   [gameMatrix.value, nextMatrix.value] = [nextMatrix.value, gameMatrix.value];
-  // }, frameTime.value);
+  drawCells();
 }
 
 function drawCells(): void {
@@ -140,7 +139,7 @@ function drawCells(): void {
     const rows = Math.floor(canvasHeight / cellSize);
     const columns = Math.floor(canvasWidth / cellSize);
 
-    context.strokeStyle = "#FF00FF";
+    context.strokeStyle = gameSettings.value.gridColor;
     context.lineWidth = 1;
 
     context.beginPath();
