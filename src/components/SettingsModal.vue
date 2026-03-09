@@ -84,13 +84,19 @@
                 <li>
                   "G"
                   <ul>
-                    <li>T</li>
+                    <li>Toggle grid view</li>
                   </ul>
                 </li>
                 <li>
                   "R"
                   <ul>
-                    <li>Pauses the simulation</li>
+                    <li>Reset the simulation</li>
+                  </ul>
+                </li>
+                <li>
+                  "N"
+                  <ul>
+                    <li>Next step (work only when the simulation is paused)</li>
                   </ul>
                 </li>
               </ul>
