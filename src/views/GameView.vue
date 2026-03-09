@@ -79,8 +79,7 @@ function getNeighborsSum(grid: Array<Array<boolean>>, rowIndex: number, colIndex
   return sum;
 }
 
-function runGame() {
-  // let gameLoop = setInterval(() => {
+function calculateNextFrame() {
   const game = gameMatrix.value;
   const next = nextMatrix.value;
 
@@ -109,7 +108,6 @@ function runGame() {
   }
 
   [gameMatrix.value, nextMatrix.value] = [nextMatrix.value, gameMatrix.value];
-  drawCells();
 }
 
 function drawCells(): void {
@@ -169,9 +167,25 @@ function drawCells(): void {
   });
 }
 
+let lastFrameTimestamp = 0;
+
+function gameLoop(timestamp: number) {
+  const delta = timestamp - lastFrameTimestamp;
+  const frameInterval = 1000 / gameSettings.value.framesPerSecond;
+
+  if (delta >= frameInterval) {
+    calculateNextFrame();
+    drawCells();
+    lastFrameTimestamp = timestamp - (delta % frameInterval);
+  }
+
+  requestAnimationFrame(gameLoop);
+}
+
 onMounted(() => {
   setupCanvas();
   setupGame();
+  requestAnimationFrame(gameLoop);
 });
 </script>
 
