@@ -1,12 +1,12 @@
 <template>
   <main>
     <canvas ref="game-canvas"></canvas>
-    <settings-modal v-model="gameSettings" @confirm="console.log('confirmed')" />
+    <settings-modal v-model="gameSettings" @redraw="drawCells()" />
   </main>
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref, useTemplateRef, watch } from "vue";
+import { onMounted, ref, useTemplateRef } from "vue";
 import SettingsModal from "@/components/SettingsModal.vue";
 
 type CellsMatrix = Array<Array<boolean>>;
@@ -15,13 +15,14 @@ const gameCanvas = useTemplateRef<HTMLCanvasElement | null>("game-canvas");
 const gameMatrix = ref<CellsMatrix>();
 const nextMatrix = ref<CellsMatrix>();
 
-const gameSettings = reactive({
-  frameTime: 1000,
-  aliveCellChance: 0.3,
+const gameSettings = ref({
+  showGrid: false,
+  framesPerSecond: 60,
+  aliveCellChance: 30,
   cellSize: 10,
   cellColors: {
-    dead: "#000",
-    alive: "#fff",
+    dead: "#000000",
+    alive: "#ffffff",
   },
 });
 
@@ -42,19 +43,23 @@ function setupCanvas(): void {
 }
 
 function setupGame(): void {
-  if (gameSettings.cellSize <= 0 || gameCanvas.value === null) {
+  if (gameSettings.value.cellSize <= 0 || gameCanvas.value === null) {
     //handle errors
     return;
   }
 
-  const rows = Math.floor(gameCanvas.value.height / gameSettings.cellSize);
-  const cols = Math.floor(gameCanvas.value.width / gameSettings.cellSize);
+  const cellSize = gameSettings.value.cellSize;
+
+  const rows = Math.ceil(gameCanvas.value.height / cellSize);
+  const cols = Math.ceil(gameCanvas.value.width / cellSize);
 
   gameMatrix.value = Array.from({ length: rows }, () =>
-    Array.from({ length: cols }, () => Math.random() < gameSettings.aliveCellChance),
+    Array.from({ length: cols }, () => Math.random() < gameSettings.value.aliveCellChance / 100),
   );
 
   nextMatrix.value = Array.from({ length: rows }, () => new Array(cols).fill(false));
+
+  drawCells();
 }
 
 function getNeighborsSum(grid: Array<Array<boolean>>, rowIndex: number, colIndex: number) {
@@ -108,8 +113,8 @@ function runGame() {
   // }, frameTime.value);
 }
 
-function drawCells(cells: CellsMatrix | undefined): void {
-  if (gameCanvas.value === null || cells === undefined) {
+function drawCells(): void {
+  if (gameCanvas.value === null || gameMatrix.value === undefined) {
     //handle errors
     return;
   }
@@ -121,18 +126,46 @@ function drawCells(cells: CellsMatrix | undefined): void {
     return;
   }
 
-  context.fillStyle = gameSettings.cellColors.dead;
+  const cellColors = gameSettings.value.cellColors;
+  const cellSize = gameSettings.value.cellSize;
+
+  context.fillStyle = cellColors.dead;
   context.fillRect(0, 0, gameCanvas.value.width, gameCanvas.value.height);
 
-  cells.forEach((row, rowIndex) => {
+  // grid
+  if (gameSettings.value.showGrid) {
+    const canvasWidth = gameCanvas.value.width;
+    const canvasHeight = gameCanvas.value.height;
+
+    const rows = Math.floor(canvasHeight / cellSize);
+    const columns = Math.floor(canvasWidth / cellSize);
+
+    context.strokeStyle = "#FF00FF";
+    context.lineWidth = 1;
+
+    context.beginPath();
+
+    for (let row = 1; row <= rows; row++) {
+      context.moveTo(0, row * cellSize);
+      context.lineTo(canvasWidth, row * cellSize);
+    }
+
+    for (let column = 1; column <= columns; column++) {
+      context.moveTo(column * cellSize, 0);
+      context.lineTo(column * cellSize, canvasHeight);
+    }
+
+    context.stroke();
+  }
+
+  // cells
+  context.fillStyle = cellColors.alive;
+  gameMatrix.value.forEach((row, rowIndex) => {
     row.forEach((value, columnIndex) => {
-      context.fillStyle = value ? gameSettings.cellColors.alive : gameSettings.cellColors.dead;
-      context.fillRect(
-        columnIndex * gameSettings.cellSize,
-        rowIndex * gameSettings.cellSize,
-        gameSettings.cellSize,
-        gameSettings.cellSize,
-      );
+      if (!value) {
+        return;
+      }
+      context.fillRect(columnIndex * cellSize, rowIndex * cellSize, cellSize, cellSize);
     });
   });
 }
@@ -140,10 +173,6 @@ function drawCells(cells: CellsMatrix | undefined): void {
 onMounted(() => {
   setupCanvas();
   setupGame();
-});
-
-watch(gameMatrix, () => {
-  drawCells(gameMatrix.value);
 });
 </script>
 
