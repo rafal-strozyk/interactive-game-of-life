@@ -75,19 +75,14 @@ function keyboardListeners(event: KeyboardEvent) {
   }
 }
 
-function pointerListeners(event: TouchEvent) {
-  event.preventDefault();
-  togglePause();
-}
-
 function setupControls(): void {
   document.addEventListener("keydown", keyboardListeners);
-  gameCanvas.value?.addEventListener("touchstart", pointerListeners, { passive: false });
+  gameCanvas.value?.addEventListener("touchstart", togglePause);
 }
 
 function removeControls(): void {
   document.addEventListener("keydown", keyboardListeners);
-  gameCanvas.value?.removeEventListener("touchstart", pointerListeners);
+  gameCanvas.value?.removeEventListener("touchstart", togglePause);
 }
 
 function setupCanvas(): void {
