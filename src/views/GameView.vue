@@ -184,6 +184,7 @@ function drawCells(): void {
   const cellColors = gameSettings.value.cellColors;
   const cellSize = gameSettings.value.cellSize;
 
+  context.translate(0.5, 0.5);
   context.fillStyle = cellColors.dead;
   context.fillRect(0, 0, gameCanvas.value.width, gameCanvas.value.height);
 
@@ -200,12 +201,12 @@ function drawCells(): void {
 
     context.beginPath();
 
-    for (let row = 1; row <= rows; row++) {
+    for (let row = 0; row <= rows; row++) {
       context.moveTo(0, row * cellSize);
       context.lineTo(canvasWidth, row * cellSize);
     }
 
-    for (let column = 1; column <= columns; column++) {
+    for (let column = 0; column <= columns; column++) {
       context.moveTo(column * cellSize, 0);
       context.lineTo(column * cellSize, canvasHeight);
     }
@@ -223,6 +224,8 @@ function drawCells(): void {
       context.fillRect(columnIndex * cellSize, rowIndex * cellSize, cellSize, cellSize);
     });
   });
+
+  context.translate(-0.5, -0.5);
 }
 
 let lastFrameTimestamp = 0;
@@ -261,6 +264,7 @@ main {
 
   canvas {
     @apply size-full flex-grow block object-cover;
+    image-rendering: pixelated;
   }
 }
 </style>
