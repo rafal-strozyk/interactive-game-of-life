@@ -14,10 +14,8 @@
   opacity: 0;
 }
 
-h1 {
-  font-family: "Pixelify Sans", sans-serif;
-  font-weight: 400;
-  margin: 0 auto 1rem;
-  font-size: 2.5rem;
-  line-height: 1;
+@layer components {
+  h1 {
+    @apply font-pixel text-4xl leading-none mt-0 mb-4 mx-auto font-normal;
+  }
 }
