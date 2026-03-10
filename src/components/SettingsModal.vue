@@ -54,6 +54,7 @@
                 </div>
                 <div class="grid sm:grid-cols-2 gap-4">
                   <input-component
+                    class="hide-on-mobile"
                     id="grid-color"
                     type="color"
                     label="Grid color:"

@@ -15,7 +15,7 @@ const gameCanvas = useTemplateRef<HTMLCanvasElement | null>("game-canvas");
 const gameMatrix = ref<CellsMatrix>();
 const nextMatrix = ref<CellsMatrix>();
 
-let showGrid = true;
+let showGrid = false;
 let animationFrameId = NaN;
 
 const gameSettings = ref({
