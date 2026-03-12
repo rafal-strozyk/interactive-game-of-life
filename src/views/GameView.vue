@@ -97,8 +97,10 @@ function setupCanvas(): void {
     window.innerHeight || 0,
   );
 
-  gameCanvas.value.width = viewportWidth;
-  gameCanvas.value.height = viewportHeight;
+  const dpr = window.devicePixelRatio;
+
+  gameCanvas.value.width = viewportWidth * dpr;
+  gameCanvas.value.height = viewportHeight * dpr;
 }
 
 function setupGame(): void {
