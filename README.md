@@ -1,5 +1,7 @@
 # Interactive Game of Life
 
+View the project [here](https://interactive-game-of-life.vercel.app/).
+<br>
 This template should help get you started developing with Vue 3 in Vite.
 
 ## Recommended IDE Setup
