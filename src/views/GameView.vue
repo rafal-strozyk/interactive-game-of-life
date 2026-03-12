@@ -184,10 +184,10 @@ function drawCells(): void {
   const cellColors = gameSettings.value.cellColors;
   const cellSize = gameSettings.value.cellSize;
 
-  context.translate(0.5, 0.5);
   context.fillStyle = cellColors.dead;
   context.fillRect(0, 0, gameCanvas.value.width, gameCanvas.value.height);
 
+  context.translate(0.5, 0.5);
   // grid
   if (showGrid) {
     const canvasWidth = gameCanvas.value.width;
